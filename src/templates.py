@@ -24,7 +24,6 @@ def make_readme_md(classes, functions, dir):
     with open(path.join(dir, 'README.md'), 'w') as file:
         file.write(md)
 
-
 def make_class_md(_class, dir):
     docstring = ast.get_docstring(_class) or ''
     doc = utils.parse_docstring(docstring, _class.name)
@@ -38,7 +37,6 @@ def make_class_md(_class, dir):
     
     with open(path.join(dir, _class.name + '.md'), 'w') as file:
         file.write(md)
-
 
 def get_function_md(func, context=''):
     docstring = ast.get_docstring(func) or ''
@@ -54,7 +52,7 @@ def get_function_md(func, context=''):
         for i in range(len(func.args.args)):
             arg = func.args.args[i].arg
             d_i = i - (len(args) - len(defaults))
-            default = '' if d_i < 0 else defaults[d_i]
+            default = '' if d_i < 0 else utils.ast_object_to_str(defaults[d_i])
             description = '' if arg not in doc['params'] else doc['params'][arg]
             md += "{} | {} | {}\n".format(arg, description, default)
         md += "\n\n"

@@ -77,3 +77,16 @@ def parse_docstring(docstring, context):
             parsed['description'] += line + ' '
     return parsed
 
+
+# TODO: maybe use a library to convert the ast to a string?
+# In particular, the lambda doesn't give very meaningful information here
+def ast_object_to_str(ast_obj):
+    if isinstance(ast_obj, ast.Num):
+        return str(ast_obj.n)
+    if isinstance(ast_obj, ast.Lambda):
+        return 'lambda ' + ','.join( arg.arg for arg in ast_obj.args.args )
+    if isinstance(ast_obj, ast.NameConstant):
+        return str(ast_obj.value)
+    if isinstance(ast_obj, ast.Str):
+        return '"' + str(ast_obj.s) + '"'
+    return ''
