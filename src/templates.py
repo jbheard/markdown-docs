@@ -1,10 +1,11 @@
 import ast
 import utils
+import os.path as path
 
 LINK_WITH_DESCRIPTION = "**[{name}]({href})**: {description}\n\n"
 LINK_NO_DESCRIPTION = "**[{name}]({href})**\n\n"
 
-def make_readme_md( classes, functions ):
+def make_readme_md(classes, functions, dir):
     md = "# Python Documentation\n\n## Classes\n\n"
     for c in classes:
         docstring = ast.get_docstring(c) or ''
@@ -20,11 +21,11 @@ def make_readme_md( classes, functions ):
     for f in functions:
         md += get_function_md(f)
     
-    with open('README.md', 'w') as file:
+    with open(path.join(dir, 'README.md'), 'w') as file:
         file.write(md)
 
 
-def make_class_md(_class):
+def make_class_md(_class, dir):
     docstring = ast.get_docstring(_class) or ''
     doc = utils.parse_docstring(docstring, _class.name)
     md = '# {}\n\n'.format(_class.name)
@@ -35,7 +36,7 @@ def make_class_md(_class):
     for func in utils.get_functions(_class):
         md += get_function_md(func, _class.name)
     
-    with open(_class.name + '.md', 'w') as file:
+    with open(path.join(dir, _class.name + '.md'), 'w') as file:
         file.write(md)
 
 
