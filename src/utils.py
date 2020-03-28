@@ -14,7 +14,7 @@ def get_all_files(dir, extension):
     for root, dirs, files in os.walk(dir):
         for name in files:
             if name.endswith(extension):
-                filenames.append(name)
+                filenames.append( path.join(root, name) )
     return filenames
 
 def load_ast(filename):
