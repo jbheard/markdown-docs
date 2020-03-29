@@ -1,27 +1,8 @@
 import sys, os, ast
 import utils
-from jinja2 import Template
-
-LINK_WITH_DESCRIPTION = "**[{name}]({href})**: {description}\n\n"
-LINK_NO_DESCRIPTION = "**[{name}]({href})**\n\n"
-
-def load_template(template_path, static=False):
-    """
-    Load a jinja2 template from a file
-    @param template_path the path to load the file from
-    @param static True to load the templates from the application path, False to load normally
-    @return a jinja2 template
-    """
-    if static:
-        root = os.path.dirname(sys.argv[0])
-        template_path = os.path.join(root, template_path)
-    with open(template_path, 'r') as f:
-        template = Template(f.read())
-    return template
 
 # TODO: make title customizeable
 def get_data(classes, functions, dir):
-    template = load_template("../templates/readme.md", True)
     data = { 'title' : 'Python Documentation', 'classes' : [], 'functions' : [] }
     for c in classes:
         c_data = get_class_data(c)

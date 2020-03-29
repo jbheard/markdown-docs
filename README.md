@@ -25,7 +25,7 @@ These tags will always be loaded. Additional tags can be defined in a new yaml f
 ```
 
 `syntax` defines the syntax to use for the tag, and each operand will be the name that the data is accessible under for templating. If syntax has a single operand, then it will be added to a 1D list. If there are multiple operands, they will be used as keys in a named collection.  
-Example: `@my_tag op1 op2` will produce a list of {'op1': value, 'op2': value} objects. @throws and @param work this way, while @authors and @return are put into a 1D list.
+Example: `@my_tag op1 op2` will produce a list of `{'op1': value, 'op2': value}` objects. @throws and @param work this way, while @authors and @return are put into a 1D list.
 
 `collection` tells the tag which collection to put the data in.
 

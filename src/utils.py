@@ -1,4 +1,5 @@
-import os, ast
+import os, sys, ast
+from jinja2 import Template
 from tag import Tag
 
 
@@ -16,6 +17,20 @@ def get_all_files(dir, extension):
             if name.endswith(extension):
                 filenames.append( os.path.join(root, name) )
     return filenames
+
+def load_template(template_path, static=False):
+    """
+    Load a jinja2 template from a file
+    @param template_path the path to load the file from
+    @param static True to load the templates from the application path, False to load normally
+    @return a jinja2 template
+    """
+    if static:
+        root = os.path.dirname(sys.argv[0])
+        template_path = os.path.join(root, template_path)
+    with open(template_path, 'r') as f:
+        template = Template(f.read())
+    return template
 
 def load_ast(filename):
     """
