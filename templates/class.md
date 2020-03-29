@@ -13,8 +13,8 @@
 #### Parameters
 name | description | default
 --- | --- | ---
-{% for param in function.params %}
-{{ param.name }} | {{ param.description }} | {{ param.default }}{% endfor %}
+{% for param in function.params %}{{ param.name }} | {{ param.description }} | {{ param.default }}
+{% endfor %}
 {% endif %}
 
 {% if function.throws %}
