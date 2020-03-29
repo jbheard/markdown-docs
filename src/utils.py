@@ -63,21 +63,38 @@ def parse_docstring(docstring, context):
     and description from the docstring
     @param docstring the docstring to parse data from
     @param context the function or class that the docstring belongs to, used for errors
-    @return a dict with keys 'params', 'description', 'throws', and 'return'
+    @return a dict with keys from docstring tags
     """
     parsed = { 'description' : '' }
     lines = docstring.splitlines()
-    for line in lines:
+    i = 0
+    while i < len(lines) and not lines[i].startswith('@'):
+        if len(lines[i]) == 0:
+            parsed['description'] += '  \n'
+        else:
+            parsed['description'] += lines[i].strip() + ' '
+        i += 1
+    curr = ''
+    for line in lines[i:]:
         line = line.strip()
-        if len(line) == 0:
-            continue
+        if len(line) == 0: continue
+
         if line.startswith('@'):
-            collection, result = Tag.parse(line)
+            if curr != '':
+                collection, result = Tag.parse(curr)
+                if result is not None:
+                    if collection not in parsed:
+                        parsed[collection] = []
+                    parsed[collection].append(result)
+            curr = line
+        else:
+            curr += ' ' + line
+    if curr != '':
+        collection, result = Tag.parse(curr)
+        if result is not None:
             if collection not in parsed:
                 parsed[collection] = []
             parsed[collection].append(result)
-        else:
-            parsed['description'] += line + ' '
     return parsed
 
 # TODO: maybe use a library to convert the ast to a string?
