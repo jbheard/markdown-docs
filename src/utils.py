@@ -77,7 +77,6 @@ def parse_docstring(docstring, context):
             parsed['description'] += line + ' '
     return parsed
 
-
 # TODO: maybe use a library to convert the ast to a string?
 # In particular, the lambda doesn't give very meaningful information here
 def ast_object_to_str(ast_obj):
