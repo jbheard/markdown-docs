@@ -1,7 +1,7 @@
 import os
 import utils
-import templates
 from tag import Tag
+from templates import get_data, load_template
 
 if __name__ == '__main__':
     from sys import argv, stderr
@@ -26,6 +26,16 @@ if __name__ == '__main__':
         functions.extend(utils.get_functions(_ast))
 
     # Create the readme, then create all subsequent 
-    templates.make_readme_md(classes, functions, output)
-    for c in classes:
-        templates.make_class_md(c, output)
+    data = get_data(classes, functions, output)
+    readme_template = load_template("../templates/readme.md", True)
+    md = readme_template.render(data)
+    with open(os.path.join(output, 'README.md'), 'w') as file:
+        file.write(md)
+
+    # Create file for each class
+    class_template = load_template("../templates/class.md", True)
+    for class_data in data['classes']:
+        md = class_template.render(class_data)
+        file_path = os.path.join(output, class_data['name'] + '.md')
+        with open(file_path, 'w') as file:
+            file.write(md)

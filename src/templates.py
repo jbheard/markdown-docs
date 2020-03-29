@@ -1,7 +1,5 @@
-import sys
-import ast
+import sys, os, ast
 import utils
-import os.path as path
 from jinja2 import Template
 
 LINK_WITH_DESCRIPTION = "**[{name}]({href})**: {description}\n\n"
@@ -15,37 +13,23 @@ def load_template(template_path, static=False):
     @return a jinja2 template
     """
     if static:
-        root = path.dirname(sys.argv[0])
-        template_path = path.join(root, template_path)
+        root = os.path.dirname(sys.argv[0])
+        template_path = os.path.join(root, template_path)
     with open(template_path, 'r') as f:
         template = Template(f.read())
     return template
 
 # TODO: make title customizeable
-def make_readme_md(classes, functions, dir):
+def get_data(classes, functions, dir):
     template = load_template("../templates/readme.md", True)
     data = { 'title' : 'Python Documentation', 'classes' : [], 'functions' : [] }
     for c in classes:
-        docstring = ast.get_docstring(c) or ''
-        c_data = {'name' : c.name, 'href' : c.name + '.md'}
-        doc = utils.parse_docstring(docstring, c.name)
-        if len(doc['description']) > 0:
-            c_data['description'] = doc['description']
+        c_data = get_class_data(c)
         data['classes'].append(c_data)
     
     for f in functions:
         data['functions'].append(get_function_data(f))
-    md = template.render(data)
-    
-    with open(path.join(dir, 'README.md'), 'w') as file:
-        file.write(md)
-
-def make_class_md(_class, dir):
-    template = load_template("../templates/class.md", True)
-    data = get_class_data(_class)
-    md = template.render(data)
-    with open(path.join(dir, _class.name + '.md'), 'w') as file:
-        file.write(md)
+    return data
 
 def get_class_data(_class):
     docstring = ast.get_docstring(_class) or ''

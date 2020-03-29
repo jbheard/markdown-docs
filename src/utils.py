@@ -1,6 +1,4 @@
-import os
-import os.path as path
-import ast
+import os, ast
 from tag import Tag
 
 
@@ -16,7 +14,7 @@ def get_all_files(dir, extension):
     for root, dirs, files in os.walk(dir):
         for name in files:
             if name.endswith(extension):
-                filenames.append( path.join(root, name) )
+                filenames.append( os.path.join(root, name) )
     return filenames
 
 def load_ast(filename):
@@ -66,16 +64,6 @@ def parse_docstring(docstring, context):
         else:
             parsed['description'] += line + ' '
     return parsed
-
-def template_to_file(template, data, out_path):
-    """
-    write a rendered template to a file
-    @param template the jinja2 template to use
-    @data the dict object to put through the template
-    @out_path the output file path
-    """
-    with open(out_path, 'w') as f:
-        f.write( template.render(data) )
 
 # TODO: maybe use a library to convert the ast to a string?
 # In particular, the lambda doesn't give very meaningful information here
