@@ -42,17 +42,20 @@ def make_readme_md(classes, functions, dir):
 
 def make_class_md(_class, dir):
     template = load_template("../templates/class.md", True)
+    data = get_class_data(_class)
+    md = template.render(data)
+    with open(path.join(dir, _class.name + '.md'), 'w') as file:
+        file.write(md)
+
+def get_class_data(_class):
     docstring = ast.get_docstring(_class) or ''
     doc = utils.parse_docstring(docstring, _class.name)
-    data = {'name':_class.name, 'description':doc['description'], 'functions':[]}
+    data = {'name':_class.name, 'href': _class.name+'.md', 'description':doc['description'], 'functions':[]}
 
     for func in utils.get_functions(_class):
         f_data = get_function_data(func, _class.name)
         data['functions'].append(f_data)
-    
-    md = template.render(data)
-    with open(path.join(dir, _class.name + '.md'), 'w') as file:
-        file.write(md)
+    return data
 
 def get_function_data(func, context=''):
     docstring = ast.get_docstring(func) or ''
