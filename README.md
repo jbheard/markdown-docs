@@ -5,6 +5,33 @@ Despite being made for markdown, it also support other formats.
 
 Markdown and HTML templates are provided, but custom templates can be used, as well as custom docstring tags.
 
+## Using the action
+
+This action can be easily added to your workflow, example working action:
+
+```
+name: Build Docs and Open PR
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Generate Python Docs
+      uses: jbheard/markdown-docs@v1
+    - name: Open docs update PR
+      uses: peter-evans/create-pull-request@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+This uses the [create-pull-request](https://github.com/marketplace/actions/create-pull-request) action to open a pull request with the generated docs.
+
+Note that input and output directories can be set with `src_path` and `dst_path` respectively. If not set, the action will look through your entire repo for python files to document, and will put the docs in `/docs`.
+
 ## Tags
 
 Tags are defined in the yaml file `src/tags.yaml`, a tag is in the form `@mytag`, the default tags that are defined are below.
