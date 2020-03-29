@@ -1,6 +1,7 @@
 import os
 import utils
 import templates
+from tag import Tag
 
 if __name__ == '__main__':
     from sys import argv, stderr
@@ -13,6 +14,8 @@ if __name__ == '__main__':
     if not os.path.isdir(output):
         os.mkdir(output)
     files = utils.get_all_files(argv[1], '.py')
+
+    Tag.load_tags('tags.yaml', True)
 
     # Convert all python files into AST objects
     classes = []

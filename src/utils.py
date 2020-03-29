@@ -1,6 +1,7 @@
 import os
 import os.path as path
 import ast
+from tag import Tag
 
 
 def get_all_files(dir, extension):
@@ -51,29 +52,17 @@ def parse_docstring(docstring, context):
     @param context the function or class that the docstring belongs to, used for errors
     @return a dict with keys 'params', 'description', 'throws', and 'return'
     """
-    parsed = { 'description' : '', 'params' : {}, 'throws' : {}, 'return' : [] }
+    parsed = { 'description' : '' }
     lines = docstring.splitlines()
     for line in lines:
         line = line.strip()
         if len(line) == 0:
             continue
-        if line.startswith('@param'):
-            parts = line.split(maxsplit=2)
-            if len(parts) < 3:
-                raise Exception("Error parsing docstring for {} at {}".format(context, line))
-            parsed['params'][parts[1]] = parts[2]
-        elif line.startswith('@return'):
-            parts = line.split(maxsplit=1)
-            if len(parts) < 2:
-                raise Exception("Error parseing docstring for {} at {}"
-                    .format(context, line))
-            parsed['return'].append( parts[1] )
-        elif line.startswith('@throws'):
-            parts = line.split(maxsplit=2)
-            if len(parts) < 3:
-                raise Exception("Error parsing docstring for {} at {}"
-                    .format(context, line))
-            parsed['throws'][parts[1]] = parts[2]
+        if line.startswith('@'):
+            collection, result = Tag.parse(line)
+            if collection not in parsed:
+                parsed[collection] = []
+            parsed[collection].append(result)
         else:
             parsed['description'] += line + ' '
     return parsed

@@ -50,32 +50,40 @@ def make_class_md(_class, dir):
 def get_class_data(_class):
     docstring = ast.get_docstring(_class) or ''
     doc = utils.parse_docstring(docstring, _class.name)
-    data = {'name':_class.name, 'href': _class.name+'.md', 'description':doc['description'], 'functions':[]}
+    doc['name'] = _class.name
+    doc['href'] = _class.name + '.md'
+    doc['functions'] = []
 
     for func in utils.get_functions(_class):
         f_data = get_function_data(func, _class.name)
-        data['functions'].append(f_data)
-    return data
+        doc['functions'].append(f_data)
+    return doc
 
 def get_function_data(func, context=''):
     docstring = ast.get_docstring(func) or ''
     doc = utils.parse_docstring(docstring, context + ' ' + func.name)
-    data = { 'name': func.name, 'description': doc['description'] }
+    doc['name'] = func.name
 
     if len(func.args.args) > 0:
-        data['params'] = []
+        if 'params' not in doc:
+            doc['params'] = []
         args = func.args.args
         defaults = func.args.defaults
         for i in range(len(func.args.args)):
             arg = func.args.args[i].arg
             d_i = i - (len(args) - len(defaults))
-            default = '' if d_i < 0 else utils.ast_object_to_str(defaults[d_i])
-            description = '' if arg not in doc['params'] else doc['params'][arg]
-            data['params'].append({'name':arg,'description':description,'default':default})
+            default = ''
+            if d_i >= 0:
+                default = utils.ast_object_to_str(defaults[d_i])
 
-    if len(doc['throws']) > 0:
-        data['throws'] = []
-        for key, val in doc['throws'].items():
-            data['throws'].append({'type':key, 'message':val})
-    return data
+            found = False
+            for i in range(len(doc['params'])):
+                param = doc['params'][i]
+                if param['name'] == arg:
+                    param['default'] = default
+                    found = True
+            if not found:
+                doc['params'].append({'name':arg,'description':'','default':default})
+
+    return doc
 
