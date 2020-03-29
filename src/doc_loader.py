@@ -2,21 +2,21 @@ import sys, os, ast
 import utils
 
 # TODO: make title customizeable
-def get_data(classes, functions, dir):
+def get_data(classes, functions, dir, extension='.md'):
     data = { 'title' : 'Python Documentation', 'classes' : [], 'functions' : [] }
     for c in classes:
-        c_data = get_class_data(c)
+        c_data = get_class_data(c, extension)
         data['classes'].append(c_data)
     
     for f in functions:
         data['functions'].append(get_function_data(f))
     return data
 
-def get_class_data(_class):
+def get_class_data(_class, extension='.md'):
     docstring = ast.get_docstring(_class) or ''
     doc = utils.parse_docstring(docstring, _class.name)
     doc['name'] = _class.name
-    doc['href'] = _class.name + '.md'
+    doc['href'] = _class.name + extension
     doc['functions'] = []
 
     for func in utils.get_functions(_class):
