@@ -19,14 +19,13 @@ class Tag(object):
         self.syntax = items[1:]
         self.collection = obj['collection']
 
-    def parse_string(self, string):
+    def parse_string(self, string: str, context: str) -> None|str|dict[str, list[str]]:
         parts = string.split(maxsplit=self.maxsplit)
         if parts[0] != self.tag:
             return None
-        
+
         if len(parts) <= self.maxsplit:
-            raise Exception("Error parsing docstring for {} at {}"
-                .format(context, line))
+            raise Exception(f'Error parsing docstring for {context}')
 
         # Don't need a dict for 1D tags
         if len(parts) == 2:
@@ -36,15 +35,15 @@ class Tag(object):
         return tag
 
     @staticmethod
-    def parse(string):
+    def parse(string: str, context: str):
         for tag in Tag._tags:
-            result = tag.parse_string(string)
+            result = tag.parse_string(string, context)
             if result is not None:
                 return tag.collection, result
         return None, None
 
     @staticmethod
-    def load_tags(yaml_path, static=False):
+    def load_tags(yaml_path: str, static: bool = False):
         """
         Loads a list of tags from a yaml file into a 
         static list Tag._tags

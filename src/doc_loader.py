@@ -1,20 +1,21 @@
-import sys, os, ast
+import ast
 import utils
 
 # TODO: make title customizeable
-def get_data(classes, functions, dir):
+def get_data(classes: list[ast.ClassDef], functions: list[ast.FunctionDef]) -> dict[str, str|list[str]]:
     data = { 'title' : 'Python Documentation', 'classes' : [], 'functions' : [] }
     for c in classes:
         c_data = get_class_data(c)
         data['classes'].append(c_data)
-    
+
     for f in functions:
         data['functions'].append(get_function_data(f))
     return data
 
-def get_class_data(_class):
+def get_class_data(_class: ast.ClassDef, context: str = '') -> dict[str, str|list[str]]:
     docstring = ast.get_docstring(_class) or ''
-    doc = utils.parse_docstring(docstring, _class.name)
+    context = f'{context}.{_class.name}'.strip('.')
+    doc = utils.parse_docstring(docstring, context)
     doc['name'] = _class.name
     doc['href'] = _class.name + '.md'
     doc['functions'] = []
@@ -24,9 +25,10 @@ def get_class_data(_class):
         doc['functions'].append(f_data)
     return doc
 
-def get_function_data(func, context=''):
+def get_function_data(func: ast.FunctionDef, context: str = '') -> dict[str, str|list[str]]:
     docstring = ast.get_docstring(func) or ''
-    doc = utils.parse_docstring(docstring, context + ' ' + func.name)
+    context = f'{context}.{func.name}'.strip('.')
+    doc = utils.parse_docstring(docstring, context)
     doc['name'] = func.name
 
     if len(func.args.args) > 0:
