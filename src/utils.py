@@ -13,7 +13,7 @@ def get_all_files(dir: str, extension: str) -> list[str]:
     for root, _, files in os.walk(dir):
         for name in files:
             if name.lower().endswith(extension):
-                filenames.append( os.path.join(root, name) )
+                filenames.append( os.path.join(root, name).replace(os.path.sep, '/') )
     return filenames
 
 def parse_docstring(docstring: str, context: str) -> dict[str, str|list[str]]:
