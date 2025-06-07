@@ -3,14 +3,14 @@ import utils
 from tag import Tag
 from doc_loader import get_data
 
-def generate_docs(input_dir: str, output_dir: str):
+def generate_docs(yaml_path: str, input_dir: str, output_dir: str):
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
     # Load all python files in the directory (and subdirectories)
     files = utils.get_all_files(input_dir, '.py')
 
-    Tag.load_tags('tags.yaml', True)
+    Tag.load_tags(yaml_path)
 
     # Convert all python files into AST objects
     classes, functions = [], []
@@ -41,4 +41,5 @@ if __name__ == '__main__':
         print("Usage: {} input_dir output_dir".format(argv[0]), file=stderr)
         exit(1)
 
-    generate_docs(argv[1], argv[2])
+    tags_yaml_path = os.path.join(os.path.dirname(argv[0]), 'tags.yaml')
+    generate_docs(yaml_path=tags_yaml_path, input_dir=argv[1], output_dir=argv[2])
