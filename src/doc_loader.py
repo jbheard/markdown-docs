@@ -1,5 +1,9 @@
 import ast
+import os.path
+from jinja2 import Template
+
 import utils
+from tag import Tag
 
 # TODO: make title customizeable
 def get_data(classes: list[ast.ClassDef], functions: list[ast.FunctionDef]) -> dict[str, str|list[str]]:
@@ -54,3 +58,33 @@ def get_function_data(func: ast.FunctionDef, context: str = '') -> dict[str, str
 
     return doc
 
+def generate_docs(yaml_path: str, templates_dir: str, input_dir: str, output_dir: str):
+    # Load all python files in the directory (and subdirectories)
+    files = utils.get_all_files(input_dir, '.py')
+    Tag.load_tags(yaml_path)
+
+    # Convert all python files into AST objects
+    classes, functions = [], []
+    for path in files:
+        with open(path, 'r') as f:
+            _ast = ast.parse(f.read())
+        classes.extend((node for node in _ast.body if isinstance(node, ast.ClassDef)))
+        functions.extend((node for node in _ast.body if isinstance(node, ast.FunctionDef)))
+
+    data = get_data(classes, functions)
+
+    # Create the readme
+    with open(os.path.join(templates_dir, 'readme.md'), 'r') as f:
+        readme_template = Template(f.read())
+    md = readme_template.render(data)
+    with open(os.path.join(output_dir, 'README.md'), 'w') as file:
+        file.write(md)
+
+    # Create file for each class
+    with open(os.path.join(templates_dir, 'class.md'), 'r') as f:
+        class_template = Template(f.read())
+    for class_data in data['classes']:
+        md = class_template.render(class_data)
+        file_path = os.path.join(output_dir, class_data['name'] + '.md')
+        with open(file_path, 'w') as file:
+            file.write(md)
