@@ -9,7 +9,7 @@ from tag import Tag
 def get_data(classes: list[ast.ClassDef], functions: list[ast.FunctionDef], extension: str = '.md') -> dict[str, str|list[str]]:
     data = { 'title' : 'Python Documentation', 'classes' : [], 'functions' : [] }
     for c in classes:
-        c_data = get_class_data(c, extension)
+        c_data = get_class_data(c, '', extension)
         data['classes'].append(c_data)
 
     for f in functions:
