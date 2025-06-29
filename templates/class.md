@@ -1,4 +1,5 @@
 # {{ name }}
+{% if authors %}Authors: **{{ authors | join(', ') }}**{% endif %}
 
 {{ description }}
 
@@ -6,9 +7,9 @@
 
 {% for function in functions %}
 ### {{ function.name }}
+{% if function.authors %}Authors: **{{ function.authors | join(', ') }}**{% endif %}
 
 {{ function.description }}
-
 {% if function.params %}
 #### Parameters
 name | description | default
@@ -18,13 +19,8 @@ name | description | default
 {% endif %}
 
 {% if function.throws %}
-
 #### Throws
-
-{% for throw in throws %}
-**{{ throw.type }}**: {{ throw.message }}  
+{% for throw in throws %}**{{ throw.type }}**: {{ throw.message }}  
 {% endfor %}
-
 {% endif %}
-
 {% endfor %}
