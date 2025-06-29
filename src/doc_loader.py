@@ -6,22 +6,22 @@ import utils
 from tag import Tag
 
 # TODO: make title customizeable
-def get_data(classes: list[ast.ClassDef], functions: list[ast.FunctionDef]) -> dict[str, str|list[str]]:
+def get_data(classes: list[ast.ClassDef], functions: list[ast.FunctionDef], extension: str = '.md') -> dict[str, str|list[str]]:
     data = { 'title' : 'Python Documentation', 'classes' : [], 'functions' : [] }
     for c in classes:
-        c_data = get_class_data(c)
+        c_data = get_class_data(c, '', extension)
         data['classes'].append(c_data)
 
     for f in functions:
         data['functions'].append(get_function_data(f))
     return data
 
-def get_class_data(_class: ast.ClassDef, context: str = '') -> dict[str, str|list[str]]:
+def get_class_data(_class: ast.ClassDef, context: str = '', extension: str = '.md') -> dict[str, str|list[str]]:
     docstring = ast.get_docstring(_class) or ''
     context = f'{context}.{_class.name}'.strip('.')
     doc = utils.parse_docstring(docstring, context)
     doc['name'] = _class.name
-    doc['href'] = _class.name + '.md'
+    doc['href'] = _class.name + extension
     doc['functions'] = []
 
     for func in utils.get_functions(_class):
