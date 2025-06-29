@@ -5,6 +5,8 @@ Despite being made for markdown, it also support other formats.
 
 Markdown and HTML templates are provided, but custom templates can be used, as well as custom docstring tags.
 
+Run unit tests with `cd src && python -m unittest discover tests`
+
 ## Using the action
 
 This action can be easily added to your workflow, example working action:

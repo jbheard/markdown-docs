@@ -1,66 +1,24 @@
-import os, sys, ast
-from jinja2 import Template
+import os, ast
 from tag import Tag
 
-
-def get_all_files(dir, extension):
+def get_all_files(dir: str, extension: str) -> list[str]:
     """
-    Gets all files with a given extension under a directory
-    Checks subfolders as well as top-level
-    @param dir directory to search in
-    @param extension file extension to check for
+    Gets all files with a given extension under a directory & subdirectories (case insensitive)
+    @param dir directory to search
+    @param extension file extension to find
     @return a list of filenames (strings)
     """
+    extension = extension.lower()
     filenames = []
-    for root, dirs, files in os.walk(dir):
+    for root, _, files in os.walk(dir):
         for name in files:
-            if name.endswith(extension):
-                filenames.append( os.path.join(root, name) )
+            if name.lower().endswith(extension):
+                filenames.append( os.path.join(root, name).replace(os.path.sep, '/') )
     return filenames
 
-def load_template(template_path, static=False):
+def parse_docstring(docstring: str, context: str) -> dict[str, str|list[str]]:
     """
-    Load a jinja2 template from a file
-    @param template_path the path to load the file from
-    @param static True to load the templates from the application path, False to load normally
-    @return a jinja2 template
-    """
-    if static:
-        root = os.path.dirname(sys.argv[0])
-        template_path = os.path.join(root, template_path)
-    with open(template_path, 'r') as f:
-        template = Template(f.read())
-    return template
-
-def load_ast(filename):
-    """
-    loads an ast from a python file
-    @param filename the name of the file to load
-    @return an ast loaded from the file
-    """
-    with open(filename, 'r') as f:
-        return ast.parse(f.read())
-
-def get_classes(_ast):
-    """
-    Gets all function definitions immediately below an ast node
-    @param _ast the ast node to search for functions in
-    @return a tuple of class definition ast nodes
-    """
-    return (node for node in _ast.body if isinstance(node, ast.ClassDef))
-
-def get_functions(_ast):
-    """
-    Gets all function definitions immediately below an ast node
-    @param _ast the ast node to search for functions in
-    @return a tuple of function definition ast nodes
-    """
-    return (node for node in _ast.body if isinstance(node, ast.FunctionDef))
-
-def parse_docstring(docstring, context):
-    """
-    Parses parameters, thrown exception types, return values, 
-    and description from the docstring
+    Parses parameters, thrown exception types, return values, and description from the docstring
     @param docstring the docstring to parse data from
     @param context the function or class that the docstring belongs to, used for errors
     @return a dict with keys from docstring tags
@@ -74,6 +32,7 @@ def parse_docstring(docstring, context):
         else:
             parsed['description'] += lines[i].strip() + ' '
         i += 1
+
     curr = ''
     for line in lines[i:]:
         line = line.strip()
@@ -81,7 +40,7 @@ def parse_docstring(docstring, context):
 
         if line.startswith('@'):
             if curr != '':
-                collection, result = Tag.parse(curr)
+                collection, result = Tag.parse(curr, context)
                 if result is not None:
                     if collection not in parsed:
                         parsed[collection] = []
@@ -89,23 +48,22 @@ def parse_docstring(docstring, context):
             curr = line
         else:
             curr += ' ' + line
+
     if curr != '':
-        collection, result = Tag.parse(curr)
+        collection, result = Tag.parse(curr, context)
         if result is not None:
             if collection not in parsed:
                 parsed[collection] = []
             parsed[collection].append(result)
+
     return parsed
 
-# TODO: maybe use a library to convert the ast to a string?
-# In particular, the lambda doesn't give very meaningful information here
-def ast_object_to_str(ast_obj):
-    if isinstance(ast_obj, ast.Num):
-        return str(ast_obj.n)
+# TODO: Review this and change if needed; lambda doesn't give very meaningful information,
+# and it might be better to escape the string with str.encode('string_escape'), also
+# should consider multi-line strings
+def ast_object_to_str(ast_obj: ast.AST) -> str:
     if isinstance(ast_obj, ast.Lambda):
         return 'lambda ' + ','.join( arg.arg for arg in ast_obj.args.args )
-    if isinstance(ast_obj, ast.NameConstant):
-        return str(ast_obj.value)
-    if isinstance(ast_obj, ast.Str):
-        return '"' + str(ast_obj.s) + '"'
+    if isinstance(ast_obj, ast.Constant):
+        return repr(ast_obj.value)
     return ''
